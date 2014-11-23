@@ -1,0 +1,64 @@
+#coding :utf-8
+import urllib
+import urllib2
+import re
+import time
+import re
+import poplib
+import smtplib
+import email
+import mimetypes
+from email.MIMEMultipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+def sendmail(to_list,sub,con):
+
+  mail_host="smtp.139.com"
+  mail_user="18914045904.com"
+  mail_pass="deepexpert"
+  mail_postfix="mail.139.com"
+
+  me = mail_user+"<"+mail_user+"@"+mail_postfix+">"
+
+  msg = MIMEMultipart('related')
+  msg['Subject'] = email.Header.Header(sub,'utf-8')
+  msg['From'] = me
+  msg['To'] = ";".join(to_list)
+  msg.preamble = 'This is a multi-part message in MIME format.'
+
+  msgAlternative = MIMEMultipart('alternative')
+  msgText = MIMEText(con, 'plain', 'utf-8')
+  msgAlternative.attach(msgText)
+  msg.attach(msgAlternative)
+
+  try:
+    s = smtplib.SMTP()
+    s.connect(mail_host)
+    s.login(mail_user,mail_pass)
+    s.sendmail(me, to_list, msg.as_string())
+    s.quit()
+
+  except Exception,e:
+    return False
+  return True
+
+class Iphone6_Spyder:
+    def getpage(self):
+        req = urllib2.Request("http://store.apple.com/hk-zh/buy-iphone/iphone6/")
+        content = urllib2.urlopen(req)
+        c = content.read()
+        data = re.compile('{"dimensionScreensize":"(.*?)","dimensionColor":"(.*?)","dimensionCapacity":"(.*?)","partNumber":".*?","price":"(.*?)","displayShippingQuote":"(.*?)".*?}').findall(c)
+        while true:
+            for i in range(data):
+                if i[4].encode('utf-8') == "暫時無法提供":
+
+                else:
+                    text = 'iphone6有现货  型号:'+i[0].encode('utf-8')+'  颜色：'+i[1].encode('utf-8')+'  内存空间：'+i[2].encode('utf-8')+'  价格：HK$'+i[3].encode('utf-8')
+                    if sendmail(['18914045904@139.com'],"订购iphone",text):
+                        print "信息发送成功，请注意查收！"
+                    else:
+                        print "邮件发送失败！"
+        time.sleep(60)
+        print "一分钟刷新一次"
+a = Iphone6_Spyder()
+a.getpage()
