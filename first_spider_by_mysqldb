@@ -29,6 +29,7 @@ class First_Spider:
         c=content.read()
         pattern = re.compile('color:green;')
         p = pattern.findall(c)
+        #执行加入数据库操作
         if p:
             print name
             sql = "insert into test(name, suffix) values('%s', '%s')" % (name,suffix)
@@ -36,15 +37,12 @@ class First_Spider:
                 cursor.execute(sql)
             except Exception, e:
                 print e
-
+    #只检测5~6位网址
     def addname(self):
         for n1 in range(97,123):
-            self.getpage(chr(n1))
             for n2 in range(97,123):
-                self.getpage(chr(n1)+chr(n2))
                 for n3 in range(97,123):
-                    print "I am texting domain name starting with",chr(n1),chr(n2),chr(n3)
-                    self.getpage(chr(n1)+chr(n2)+chr(n3))
+                    print "I am texting domain name starting with",chr(n1),chr(n2),chr(n3))
                     for n4 in range(97,123):
                         self.getpage(chr(n1)+chr(n2)+chr(n3)+chr(n4))
                         for n5 in range(97,123):
