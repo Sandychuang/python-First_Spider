@@ -1,0 +1,57 @@
+__author__ = 'Administrator'
+#coding:utf-8
+import urllib
+import urllib2
+import re
+import MySQLdb
+url_dollar = 'http://hq.sinajs.cn/?rn=1417869104754&list=AUDCHF,AUDHKD,AUDJPY,AUDUSD,CADHKD,CADJPY,CHFCAD,CHFHKD,DINIW,EURUSD,GBPEUR,GBPHKD,GBPUSD,USDCAD,USDCHF,USDCNY,USDHKD,USDJPY,gb_dji,gb_ixic,hf_C,hf_CAD,hf_CL,hf_GC,hf_S,hf_SI,int_hangseng,int_nikkei';
+
+def dollar():
+    req = urllib2.Request(url_dollar)
+    data = urllib2.urlopen(req).read()
+    print data
+    r1 = 'var hq_str_DINIW="(.*?),(.*?),'
+    r2 = 'var hq_str_hf_CL="(.*?),'
+    r3 = 'var hq_str_USDCNY="(.*?),(.*?),'
+
+    m1 = re.compile(r1).findall(data)
+    m2 = re.compile(r2).findall(data)
+    m3 = re.compile(r3).findall(data)
+
+    print '时间：',m1[0][0],'美金指数：',m1[0][1],'原油指数',m2[0],'人民币美金汇率：',m3[0][1]
+
+class Golbal:
+    def __init__(self):
+        self.conn= MySQLdb.connect(
+            host='localhost',
+            port = 3306,
+            user='root',
+            passwd='root',
+            db ='ttt' )
+        self.cur = self.conn.cursor()
+        self.cur.execute("DROP TABLE IF EXISTS EMPLOYEE")
+        sql = "create table if not exists global(time varchar(128) primary key, conc varchar(128),ex_rate varchar(128),DINIM varchar(128))"
+        self.cur.execute(sql)
+
+    def load(self):
+        req = urllib2.Request(url_dollar)
+        data = urllib2.urlopen(req).read()
+        print data
+        r1 = 'var hq_str_DINIW="(.*?),(.*?),'
+        r2 = 'var hq_str_hf_CL="(.*?),'
+        r3 = 'var hq_str_USDCNY="(.*?),(.*?),'
+
+        m1 = re.compile(r1).findall(data)
+        m2 = re.compile(r2).findall(data)
+        m3 = re.compile(r3).findall(data)
+
+
+        self.cur.execute("INSERT INTO global(time,conc, ex_rate, DINIM)VALUES (m1[0][0], m3[0][1], m2[0],m1[0][1]")
+        self.conn.commit()
+
+    def __del__(self):
+        self.conn.close()
+
+
+a = Golbal()
+a.load()
